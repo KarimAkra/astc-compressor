@@ -5,9 +5,7 @@ import sys.io.File;
 import util.ProcessUtil;
 
 import haxe.Json;
-
 import haxe.io.Path;
-
 import haxe.ds.Map;
 
 import sys.FileSystem;
@@ -96,14 +94,6 @@ class Main
 		{
 			Sys.setCwd(dir);
 
-			Sys.println('');
-			Sys.println('==========================');
-			Sys.println('=                        =');
-			Sys.println('= ${ANSIUtil.apply('ASTC Compressor', [Red, Bold])} v${ANSIUtil.apply(VERSION, [White, Bold])} =');
-			Sys.println('=                        =');
-			Sys.println('==========================');
-			Sys.println('');
-
 			if (command != null)
 			{
 				switch (command)
@@ -162,8 +152,10 @@ class Main
 							Sys.exit(1);
 						}
 					case 'rebuild':
+						printTitle();
 						rebuildCommand();
 					case 'help':
+						printTitle();
 						helpCommand();
 					default:
 						Sys.println(ANSIUtil.apply('Unknown command "$command".', [Red]));
@@ -181,6 +173,18 @@ class Main
 			Sys.println(ANSIUtil.apply('No dir to run.', [Red]));
 			Sys.exit(1);
 		}
+	}
+
+	@:noCompletion
+	private static function printTitle():Void
+	{
+		Sys.println('');
+		Sys.println('==========================');
+		Sys.println('=                        =');
+		Sys.println('= ${ANSIUtil.apply('ASTC Compressor', [Red, Bold])} v${ANSIUtil.apply(VERSION, [White, Bold])} =');
+		Sys.println('=                        =');
+		Sys.println('==========================');
+		Sys.println('');
 	}
 
 	@:noCompletion
@@ -262,30 +266,45 @@ class Main
 						final path:Path = new Path(f);
 
 						if (path.ext != null && path.ext.length > 0)
-							return SUPPORTED_EXTENSIONS.contains(path.ext);
+						{
+							var outputFile:String = Path.withExtension(path.toString(), 'astc');
+
+							if (output != null && output.length > 0)
+								outputFile = Path.join([output, outputFile]);
+
+							final doesOutputedExist:Bool = FileSystem.exists(outputFile);
+							final supportedExtension:Bool = SUPPORTED_EXTENSIONS.contains(path.ext);
+							final excluded:Bool = isExcluded(path.toString(), excludedFiles);
+
+							return !doesOutputedExist && supportedExtension && !excluded;
+						}
 					}
 
 					return false;
 				});
 
-				Sys.println('- ${ANSIUtil.apply('${ANSIUtil.apply('Compressing:', [Black, Bold])} colorProfile=${ANSIUtil.apply(colorprofile, [Yellow])} blockSize=${ANSIUtil.apply(blockSize, [Yellow])} quality=${ANSIUtil.apply(quality, [Yellow])}', [White, Bold])}');
-
-				for (file in files)
+				if (files.length > 0)
 				{
-					if (!isExcluded(file, excludedFiles))
+					printTitle();
+
+					Sys.println('- ${ANSIUtil.apply('${ANSIUtil.apply('Compressing:', [Black, Bold])} colorProfile=${ANSIUtil.apply(colorprofile, [Yellow])} blockSize=${ANSIUtil.apply(blockSize, [Yellow])} quality=${ANSIUtil.apply(quality, [Yellow])}', [White, Bold])}');
+
+					for (file in files)
+					{
 						compressFile(colorprofile, file, output, blockSize, quality);
+					}
 				}
 			}
 			else
 			{
+				printTitle();
+
 				final path:Path = new Path(input);
 
 				if (path.ext != null && path.ext.length > 0)
 				{
 					if (SUPPORTED_EXTENSIONS.contains(path.ext))
 					{
-						Sys.println('');
-
 						Sys.println('- ${ANSIUtil.apply('${ANSIUtil.apply('Compressing:', [Black, Bold])} colorProfile=${ANSIUtil.apply(colorprofile, [Yellow])} blockSize=${ANSIUtil.apply(blockSize, [Yellow])} quality=${ANSIUtil.apply(quality, [Yellow])}', [White, Bold])}');
 
 						compressFile(colorprofile, path.toString(), output, blockSize, quality);
@@ -313,7 +332,8 @@ class Main
 	@:noCompletion
 	private static function compressFromJSONCommand():Void
 	{
-		if (COMPRESSION_DATA == null) return;
+		if (COMPRESSION_DATA == null)
+			return;
 
 		var colorprofile:String = COMPRESSION_DATA.colorprofile;
 		var input:String = COMPRESSION_DATA.input;
@@ -350,17 +370,30 @@ class Main
 						final path:Path = new Path(f);
 
 						if (path.ext != null && path.ext.length > 0)
-							return SUPPORTED_EXTENSIONS.contains(path.ext);
+						{
+							var outputFile:String = Path.withExtension(path.toString(), 'astc');
+
+							if (output != null && output.length > 0)
+								outputFile = Path.join([output, outputFile]);
+
+							final doesOutputedExist:Bool = FileSystem.exists(outputFile);
+							final supportedExtension:Bool = SUPPORTED_EXTENSIONS.contains(path.ext);
+							final excluded:Bool = isExcluded(path.toString(), excludedFiles);
+
+							return !doesOutputedExist && supportedExtension && !excluded;
+						}
 					}
 
 					return false;
 				});
 
-				Sys.println('- ${ANSIUtil.apply('${ANSIUtil.apply('Compressing:', [Black, Bold])} colorProfile=${ANSIUtil.apply(colorprofile, [Yellow])} blockSize=${ANSIUtil.apply(blockSize, [Yellow])} quality=${ANSIUtil.apply(quality, [Yellow])}', [White, Bold])}');
-
-				for (file in files)
+				if (files.length > 0)
 				{
-					if (!isExcluded(file, excludedFiles))
+					printTitle();
+
+					Sys.println('- ${ANSIUtil.apply('${ANSIUtil.apply('Compressing:', [Black, Bold])} colorProfile=${ANSIUtil.apply(colorprofile, [Yellow])} blockSize=${ANSIUtil.apply(blockSize, [Yellow])} quality=${ANSIUtil.apply(quality, [Yellow])}', [White, Bold])}');
+
+					for (file in files)
 					{
 						var customDataKey:Null<String> = getCustomDataKey(file);
 
@@ -368,7 +401,8 @@ class Main
 						{
 							var customData:Null<CustomCompressionAsset> = CUSTOM_COMPRESSION_DATA.get(customDataKey);
 							@:nullSafety(Off)
-							compressFile(customData.colorprofile ?? colorprofile, file, output, customData.blocksize ?? blockSize, customData.quality ?? quality, true);
+							compressFile(customData.colorprofile ?? colorprofile, file, output, customData.blocksize ?? blockSize,
+								customData.quality ?? quality, true);
 						}
 						else
 						{
@@ -397,7 +431,8 @@ class Main
 		if (output != null && output.length > 0)
 			outputFile = Path.join([output, outputFile]);
 
-		if (FileSystem.exists(outputFile)) return;
+		if (FileSystem.exists(outputFile))
+			return;
 
 		FileUtil.createDirectory(Path.directory(outputFile));
 
@@ -468,40 +503,40 @@ class Main
 
 	@:noCompletion
 	private static function isExcluded(file:String, excludes:Array<String>):Bool
-  {
-    for (exclusion in excludes)
-    {
-      if (exclusion.endsWith("/"))
-      {
-        var normalizedFilePath = Path.normalize(file);
-        var normalizedExclusion = Path.normalize(exclusion);
+	{
+		for (exclusion in excludes)
+		{
+			if (exclusion.endsWith("/"))
+			{
+				var normalizedFilePath = Path.normalize(file);
+				var normalizedExclusion = Path.normalize(exclusion);
 
-        if (normalizedFilePath.startsWith(normalizedExclusion))
-        {
-          return true;
-        }
-      }
-      else if (exclusion.endsWith("/*"))
-      {
-        var normalizedExclusion = Path.normalize(exclusion.substr(0, exclusion.length - 2));
-        var fileDirectory = Path.directory(Path.normalize(file));
+				if (normalizedFilePath.startsWith(normalizedExclusion))
+				{
+					return true;
+				}
+			}
+			else if (exclusion.endsWith("/*"))
+			{
+				var normalizedExclusion = Path.normalize(exclusion.substr(0, exclusion.length - 2));
+				var fileDirectory = Path.directory(Path.normalize(file));
 
-        if (fileDirectory == normalizedExclusion)
-        {
-          return true;
-        }
-      }
-      else
-      {
-        if (file == exclusion)
-        {
-          return true;
-        }
-      }
-    }
+				if (fileDirectory == normalizedExclusion)
+				{
+					return true;
+				}
+			}
+			else
+			{
+				if (file == exclusion)
+				{
+					return true;
+				}
+			}
+		}
 
-    return false;
-  }
+		return false;
+	}
 
 	@:noCompletion
 	private static function parseCompressionJSON(file:String):Void
@@ -518,7 +553,6 @@ class Main
 			Sys.exit(1);
 		}
 
-		// @:nullSafety(Off)
 		COMPRESSION_DATA = cast Json.parse(File.getContent(file));
 
 		final colorprofile:Null<String> = COMPRESSION_DATA.colorprofile;
@@ -526,8 +560,7 @@ class Main
 		final blocksize:Null<String> = COMPRESSION_DATA.blocksize;
 		final quality:Null<String> = COMPRESSION_DATA.quality;
 
-		final hasColorProfile:Bool = colorprofile != null
-			&& colorprofile.length > 0 ? COLOR_PROFILES.contains(colorprofile) : false;
+		final hasColorProfile:Bool = colorprofile != null && colorprofile.length > 0 ? COLOR_PROFILES.contains(colorprofile) : false;
 		final hasInput:Bool = input != null && input.length > 0;
 		final hasBlocksize:Bool = blocksize != null && ~/^\d+x\d+$/.match(blocksize);
 		final hasQuality:Bool = quality != null && quality.length > 0 ? COMPRESSION.contains(quality) : false;
@@ -564,58 +597,61 @@ class Main
 
 	@:noCompletion
 	private static function getCustomDataKey(file:String):Null<String>
-  {
-		if (CUSTOM_COMPRESSION_DATA == null) return null;
+	{
+		if (CUSTOM_COMPRESSION_DATA == null)
+			return null;
 
-    for (asset in CUSTOM_COMPRESSION_DATA.keys())
-    {
-      if (asset.endsWith("/"))
-      {
-        var normalizedFilePath = Path.normalize(file);
-        var normalizedAsset = Path.normalize(asset.substr(0, asset.length - 2));
+		for (asset in CUSTOM_COMPRESSION_DATA.keys())
+		{
+			if (asset.endsWith("/"))
+			{
+				var normalizedFilePath = Path.normalize(file);
+				var normalizedAsset = Path.normalize(asset.substr(0, asset.length - 2));
 
-        if (normalizedFilePath.startsWith(normalizedAsset))
-        {
-          return asset;
-        }
-      }
-      else if (asset.endsWith("/*"))
-      {
-        var normalizedAsset = Path.normalize(asset);
-        var fileDirectory = Path.directory(Path.normalize(file));
+				if (normalizedFilePath.startsWith(normalizedAsset))
+				{
+					return asset;
+				}
+			}
+			else if (asset.endsWith("/*"))
+			{
+				var normalizedAsset = Path.normalize(asset);
+				var fileDirectory = Path.directory(Path.normalize(file));
 
-        if (fileDirectory == normalizedAsset)
-        {
-          return asset;
-        }
-      }
-      else
-      {
-        if (file == asset)
-        {
-          return asset;
-        }
-      }
-    }
+				if (fileDirectory == normalizedAsset)
+				{
+					return asset;
+				}
+			}
+			else
+			{
+				if (file == asset)
+				{
+					return asset;
+				}
+			}
+		}
 
-    return null;
-  }
+		return null;
+	}
 }
 
-typedef ComppressionData = {
-		public var input:String;
-		public var output:String;
-		public var blocksize:String;
-		public var quality:String;
-		public var colorprofile:String;
-		@:optional public var clean:Bool;
-		@:optional public var excludes:Array<String>;
-		@:optional public var custom:Array<CustomCompressionAsset>;
+typedef ComppressionData =
+{
+	public var input:String;
+	public var output:String;
+	public var blocksize:String;
+	public var quality:String;
+	public var colorprofile:String;
+	@:optional public var clean:Bool;
+	@:optional public var excludes:Array<String>;
+	@:optional public var custom:Array<CustomCompressionAsset>;
 }
 
-typedef CustomCompressionAsset = {
-		public var asset:String;
-		@:optional public var blocksize:String;
-		@:optional public var quality:String;
-		@:optional public var colorprofile:String;
+typedef CustomCompressionAsset =
+{
+	public var asset:String;
+	@:optional public var blocksize:String;
+	@:optional public var quality:String;
+	@:optional public var colorprofile:String;
 }
