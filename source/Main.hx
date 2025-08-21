@@ -400,6 +400,7 @@ class Main
 						if (customDataKey != null && CUSTOM_COMPRESSION_DATA != null)
 						{
 							var customData:Null<CustomCompressionAsset> = CUSTOM_COMPRESSION_DATA.get(customDataKey);
+
 							@:nullSafety(Off)
 							compressFile(customData.colorprofile ?? colorprofile, file, output, customData.blocksize ?? blockSize,
 								customData.quality ?? quality, true);
@@ -588,7 +589,8 @@ class Main
 		{
 			for (data in COMPRESSION_DATA.custom)
 			{
-				CUSTOM_COMPRESSION_DATA = new Map<String, CustomCompressionAsset>();
+				if (CUSTOM_COMPRESSION_DATA == null)
+					CUSTOM_COMPRESSION_DATA = new Map<String, CustomCompressionAsset>();
 
 				CUSTOM_COMPRESSION_DATA.set(data.asset, data);
 			}
