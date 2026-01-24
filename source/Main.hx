@@ -1,5 +1,6 @@
 package;
 
+import sys.FileStat;
 import sys.io.File;
 
 import util.ProcessUtil;
@@ -433,7 +434,13 @@ class Main
 			outputFile = Path.join([output, outputFile]);
 
 		if (FileSystem.exists(outputFile))
-			return;
+		{
+			var inputStat:FileStat = FileSystem.stat(file);
+			var outputStat:FileStat = FileSystem.stat(outputFile);
+
+			if (inputStat.mtime.getTime() < outputStat.mtime.getTime())
+				return;
+		}
 
 		FileUtil.createDirectory(Path.directory(outputFile));
 
