@@ -2,7 +2,7 @@
 
 ![](https://img.shields.io/github/repo-size/KarimAkra/astc-compressor) ![](https://badgen.net/github/open-issues/KarimAkra/astc-compressor) ![](https://badgen.net/badge/license/MIT/green)
 
-A Haxe/[Neko](https://haxe.org/manual/target-neko.html) runner for compressing image files as ASTC textures using [ASTC-Encoder](https://github.com/ARM-software/astc-encoder).
+A Haxe runner for compressing image files as ASTC textures using [ASTC-Encoder](https://github.com/ARM-software/astc-encoder).
 
 ### Installation
 

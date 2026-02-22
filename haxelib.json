@@ -1,23 +1,13 @@
 {
-	"name": "astc-compressor",
-	"url": "https://github.com/KarimAkra/astc-compressor",
-	"license": "MIT",
-	"tags": [
-		"tools",
-		"helpers",
-		"compressor",
-		"ansi"
-	],
-	"classPath": "source",
-	"main": "Main",
-	"description": "A Haxe runner for compressing image files as ASTC textures using ASTC-Encoder.",
-	"version": "3.1.1",
-	"releasenote": "Rewrite the codebase.",
-	"contributors": [
-		"KarimAkra",
-		"MAJigsaw77"
-	],
-	"dependencies": {
-		"lime": ""
-	}
+  "name": "astc-compressor",
+  "url": "https://github.com/KarimAkra/astc-compressor",
+  "license": "MIT",
+  "tags": ["tools", "helpers", "compressor", "ansi"],
+  "classPath": "source",
+  "main": "Main",
+  "description": "A Haxe runner for compressing image files as ASTC textures using ASTC-Encoder.",
+  "version": "3.1.1",
+  "releasenote": "Rewrite the codebase.",
+  "contributors": ["KarimAkra", "MAJigsaw77"],
+  "dependencies": {}
 }
