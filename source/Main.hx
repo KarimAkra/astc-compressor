@@ -152,9 +152,6 @@ class Main
 
 							Sys.exit(1);
 						}
-					case 'rebuild':
-						printTitle();
-						rebuildCommand();
 					case 'help':
 						printTitle();
 						helpCommand();
@@ -516,26 +513,6 @@ class Main
 	}
 
 	@:noCompletion
-	private static function rebuildCommand():Void
-	{
-		final oldCwd:String = Sys.getCwd();
-
-		Sys.setCwd(LIB_PATH);
-
-		final result:Int = ProcessUtil.runCommand('haxe', ['build.hxml']);
-
-		Sys.setCwd(oldCwd);
-
-		if (result != 0)
-		{
-			Sys.println(ANSIUtil.apply('Failed to rebuild.', [Red]));
-			Sys.exit(result);
-		}
-		else
-			Sys.println(ANSIUtil.apply('Successfully rebuilt "astc-compressor" runner.', [Green]));
-	}
-
-	@:noCompletion
 	private static function helpCommand():Void
 	{
 		Sys.println('- ${ANSIUtil.apply('Usage:', [Cyan, Bold])} ${ANSIUtil.apply('haxelib run astc-compressor', [Yellow])} <command> [options] <dir>');
@@ -544,7 +521,6 @@ class Main
 		Sys.println('- ${ANSIUtil.apply('Commands:', [Cyan, Bold])}');
 		Sys.println('  ${ANSIUtil.apply('compress', [Green])}             Compress images in the specified directory or file.');
 		Sys.println('  ${ANSIUtil.apply('compress-from-json', [Green])}   Use data from a JSON file to compress images in a specified directory.');
-		Sys.println('  ${ANSIUtil.apply('rebuild', [Green])}              Rebuilds the Haxe runner.');
 		Sys.println('  ${ANSIUtil.apply('help', [Green])}                 Displays this help message.');
 		Sys.println('');
 
@@ -555,6 +531,7 @@ class Main
 		Sys.println('  ${ANSIUtil.apply('-quality <level>', [Green])}             Compression quality level: ${ANSIUtil.apply('fastest', [Magenta])}, ${ANSIUtil.apply('fast', [Magenta])}, ${ANSIUtil.apply('medium', [Magenta])}, ${ANSIUtil.apply('thorough', [Magenta])}, ${ANSIUtil.apply('exhaustive', [Magenta])}');
 		Sys.println('  ${ANSIUtil.apply('-o <output>', [Green])}                  (Optional) Output directory for .astc files.');
 		Sys.println('  ${ANSIUtil.apply('-excludes <file>', [Green])}             (Optional) File with list of input paths to skip.');
+		Sys.println('  ${ANSIUtil.apply('-no-premultiplyAlpha', [Green])}         (Optional) Disable alpha premultiplying.');
 		Sys.println('  ${ANSIUtil.apply('-clean', [Green])}                       (Optional) Clean output directory before compressing.');
 		Sys.println('');
 
