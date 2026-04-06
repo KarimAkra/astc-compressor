@@ -1,6 +1,6 @@
-package;
+package compressor;
 
-import util.ANSIUtil;
+import compressor.util.ANSIUtil;
 
 using StringTools;
 

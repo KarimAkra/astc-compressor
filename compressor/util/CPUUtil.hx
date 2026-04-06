@@ -1,4 +1,4 @@
-package util;
+package compressor.util;
 
 import sys.io.Process;
 

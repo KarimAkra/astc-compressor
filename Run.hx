@@ -1,23 +1,24 @@
 package;
 
+import compressor.Progress;
+import compressor.util.ANSIUtil;
+import compressor.util.CPUUtil;
+import compressor.util.FileUtil;
+import compressor.util.ProcessUtil;
+
 import haxe.Json;
 import haxe.crypto.Md5;
 import haxe.ds.Map;
-import haxe.io.Path;
 import haxe.io.Bytes;
+import haxe.io.Path;
 
 import sys.FileSystem;
 import sys.io.File;
 
-import util.ANSIUtil;
-import util.CPUUtil;
-import util.FileUtil;
-import util.ProcessUtil;
-
 using StringTools;
 
 @:nullSafety
-class Main
+class Run
 {
 	@:noCompletion
 	private static final VERSION:String = '1.0.0';
@@ -116,7 +117,8 @@ class Main
 						if (hasColorProfile && hasInput && hasBlocksize && hasQuality)
 						{
 							@:nullSafety(Off)
-							compressCommand(colorprofile, input, blocksize, quality, options.get('o'), options.get('excludes'), premultiplyAlpha, options.exists('clean'));
+							compressCommand(colorprofile, input, blocksize, quality, options.get('o'), options.get('excludes'), premultiplyAlpha,
+								options.exists('clean'));
 						}
 						else
 						{
@@ -233,7 +235,7 @@ class Main
 
 	@:noCompletion
 	private static function compressCommand(colorprofile:String, input:String, blockSize:String, quality:String, ?output:String, ?excludes:String,
-		?premultiplyAlpha:Bool, ?clean:Bool):Void
+			?premultiplyAlpha:Bool, ?clean:Bool):Void
 	{
 		if (clean && (output != null && output.length > 0 && FileSystem.exists(output) && FileUtil.isDirectory(output)))
 			FileUtil.deletePath(output);
@@ -275,7 +277,8 @@ class Main
 							if (!supportedExtension)
 								return false;
 
-							return needsRecompiled(f, outputFile, blockSize, quality, colorprofile, premultiplyAlpha ?? true, []) && !isExcluded(path.toString(), excludedFiles);
+							return needsRecompiled(f, outputFile, blockSize, quality, colorprofile, premultiplyAlpha ?? true, [])
+								&& !isExcluded(path.toString(), excludedFiles);
 						}
 					}
 
@@ -392,9 +395,8 @@ class Main
 								var customData:Null<CustomCompressionAsset> = CUSTOM_COMPRESSION_DATA.get(customDataKey);
 
 								@:nullSafety(Off)
-								shouldRecompile = needsRecompiled(f, outputFile, customData.blocksize ?? blockSize,
-									customData.quality ?? quality, customData.colorprofile ?? colorprofile,
-									customData.premultiplyAlpha ?? premultiplyAlpha,
+								shouldRecompile = needsRecompiled(f, outputFile, customData.blocksize ?? blockSize, customData.quality ?? quality,
+									customData.colorprofile ?? colorprofile, customData.premultiplyAlpha ?? premultiplyAlpha,
 									customData.extraParams == null ? extraParams : customData.extraParams.concat(extraParams));
 							}
 							else
@@ -426,7 +428,8 @@ class Main
 
 							@:nullSafety(Off)
 							compressFile(progress, customData.colorprofile ?? colorprofile, file, output, customData.blocksize ?? blockSize,
-								customData.quality ?? quality, customData.premultiplyAlpha ?? premultiplyAlpha, customData.extraParams == null ? extraParams : customData.extraParams.concat(extraParams), true);
+								customData.quality ?? quality, customData.premultiplyAlpha ?? premultiplyAlpha,
+								customData.extraParams == null ? extraParams : customData.extraParams.concat(extraParams), true);
 						}
 						else
 						{
@@ -449,7 +452,7 @@ class Main
 	}
 
 	private static function compressFile(?progress:Progress, colorprofile:String, file:String, output:Null<String>, blockSize:String, quality:String,
-		premultiplyAlpha:Bool, extraParams:Array<String>, extraLogs:Bool = false):Void
+			premultiplyAlpha:Bool, extraParams:Array<String>, extraLogs:Bool = false):Void
 	{
 		var outputFile:String = Path.withExtension(file, 'astc');
 
@@ -482,7 +485,8 @@ class Main
 		args.push(blockSize);
 		args.push('-$quality');
 		args.push('-silent');
-		if (premultiplyAlpha) args.push('-pp-premultiply');
+		if (premultiplyAlpha)
+			args.push('-pp-premultiply');
 		args = args.concat(extraParams);
 
 		ProcessUtil.runCommand(ASTC_ENCODER_PATH, args);
@@ -556,7 +560,8 @@ class Main
 		{
 			if (exclusion.endsWith("/"))
 			{
-				if (file.startsWith(exclusion)) return true;
+				if (file.startsWith(exclusion))
+					return true;
 			}
 			else if (exclusion.endsWith("/*"))
 			{
@@ -581,7 +586,8 @@ class Main
 	}
 
 	@:noCompletion
-	private static function needsRecompiled(input:String, output:String, blocksize:String, quality:String, colorprofile:String, premultiplyAlpha:Bool, extraParams:Array<String>):Bool
+	private static function needsRecompiled(input:String, output:String, blocksize:String, quality:String, colorprofile:String, premultiplyAlpha:Bool,
+			extraParams:Array<String>):Bool
 	{
 		if (!FileSystem.exists(output))
 			return true;
@@ -608,7 +614,8 @@ class Main
 	}
 
 	@:noCompletion
-	private static function createHash(path:String, blocksize:String, quality:String, colorprofile:String, premultiplyAlpha:Bool, extraParams:Array<String>):String
+	private static function createHash(path:String, blocksize:String, quality:String, colorprofile:String, premultiplyAlpha:Bool,
+			extraParams:Array<String>):String
 	{
 		var astcFormatList:Array<String> = [];
 		astcFormatList.push(path);
