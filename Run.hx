@@ -116,8 +116,8 @@ class Run
 						if (hasColorProfile && hasInput && hasBlocksize && hasQuality)
 						{
 							@:nullSafety(Off)
-							compressCommand(colorprofile, input, blocksize, quality, options.get('o'), options.get('excludes'), options.exists('premultiplyAlpha'),
-								options.exists('clean'));
+							compressCommand(colorprofile, input, blocksize, quality, options.get('o'), options.get('excludes'),
+								options.exists('premultiplyAlpha'), options.exists('clean'));
 						}
 						else
 						{
@@ -290,7 +290,7 @@ class Run
 
 					final progress:Progress = new Progress(0, files.length);
 
-					Sys.println('- ${ANSIUtil.apply('${ANSIUtil.apply('Compressing: (${progress.total} file${progress.total > 1 ? 's' : ''})', [Black, Bold])} colorProfile=${ANSIUtil.apply(colorprofile, [Yellow])} blockSize=${ANSIUtil.apply(blockSize, [Yellow])} quality=${ANSIUtil.apply(quality, [Yellow])}', [White, Bold])}');
+					Sys.println('- ${ANSIUtil.apply('${ANSIUtil.apply('Compressing: (${progress.total} file${progress.total > 1 ? 's' : ''})', [Black, Bold])} colorProfile=${ANSIUtil.apply(colorprofile, [Yellow])} blockSize=${ANSIUtil.apply(blockSize, [Yellow])} quality=${ANSIUtil.apply(quality, [Yellow])} premultiplyAlpha=${ANSIUtil.apply(premultiplyAlpha, [Yellow])}', [White, Bold])}');
 
 					for (file in files)
 					{
@@ -308,7 +308,7 @@ class Run
 				{
 					if (SUPPORTED_EXTENSIONS.contains(path.ext))
 					{
-						Sys.println('- ${ANSIUtil.apply('${ANSIUtil.apply('Compressing:', [Black, Bold])} colorProfile=${ANSIUtil.apply(colorprofile, [Yellow])} blockSize=${ANSIUtil.apply(blockSize, [Yellow])} quality=${ANSIUtil.apply(quality, [Yellow])}', [White, Bold])}');
+						Sys.println('- ${ANSIUtil.apply('${ANSIUtil.apply('Compressing:', [Black, Bold])} colorProfile=${ANSIUtil.apply(colorprofile, [Yellow])} blockSize=${ANSIUtil.apply(blockSize, [Yellow])} quality=${ANSIUtil.apply(quality, [Yellow])} premultiplyAlpha=${ANSIUtil.apply(premultiplyAlpha, [Yellow])}', [White, Bold])}');
 
 						compressFile(colorprofile, path.toString(), output, blockSize, quality, premultiplyAlpha, []);
 					}
@@ -414,7 +414,7 @@ class Run
 
 					final progress:Progress = new Progress(0, files.length);
 
-					Sys.println('- ${ANSIUtil.apply('${ANSIUtil.apply('Compressing: (${progress.total} file${progress.total > 1 ? 's' : ''})', [Black, Bold])} colorProfile=${ANSIUtil.apply(colorprofile, [Yellow])} blockSize=${ANSIUtil.apply(blockSize, [Yellow])} quality=${ANSIUtil.apply(quality, [Yellow])}', [White, Bold])}');
+					Sys.println('- ${ANSIUtil.apply('${ANSIUtil.apply('Compressing: (${progress.total} file${progress.total > 1 ? 's' : ''})', [Black, Bold])} colorProfile=${ANSIUtil.apply(colorprofile, [Yellow])} blockSize=${ANSIUtil.apply(blockSize, [Yellow])} quality=${ANSIUtil.apply(quality, [Yellow])} premultiplyAlpha=${ANSIUtil.apply(premultiplyAlpha, [Yellow])}', [White, Bold])}');
 
 					for (file in files)
 					{
@@ -464,14 +464,14 @@ class Run
 			progress.current++;
 
 			if (extraLogs)
-				Sys.println('  - ${progress.getFormattedProgress()} ${prettyOutputFile(outputFile)} (${ANSIUtil.apply(quality + ' - ' + blockSize, [Green, Bold])})');
+				Sys.println('  - ${progress.getFormattedProgress()} ${prettyOutputFile(outputFile)} (${ANSIUtil.apply(quality + ' - ' + blockSize + ' - ' + '${premultiplyAlpha ? 'Premultiplying Alpha' : 'No Alpha Premultiplication'}', [Green, Bold])})');
 			else
 				Sys.println('  - ${progress.getFormattedProgress()} ${prettyOutputFile(outputFile)}');
 		}
 		else
 		{
 			if (extraLogs)
-				Sys.println('  - ${prettyOutputFile(outputFile)} (${ANSIUtil.apply(quality + ' - ' + blockSize, [Green, Bold])})');
+				Sys.println('  - ${prettyOutputFile(outputFile)} (${ANSIUtil.apply(quality + ' - ' + blockSize + ' - ' + '${premultiplyAlpha ? 'Premultiplying Alpha' : 'No Alpha Premultiplication'}', [Green, Bold])})');
 			else
 				Sys.println('  - ${prettyOutputFile(outputFile)}');
 		}
