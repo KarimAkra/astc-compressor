@@ -45,7 +45,7 @@ class Run
 	private static var LIB_PATH:String = '';
 
 	@:noCompletion
-	private static var COMPRESSION_DATA:Null<ComppressionData> = null;
+	private static var COMPRESSION_DATA:Null<CompressionData> = null;
 
 	@:noCompletion
 	private static var CUSTOM_COMPRESSION_DATA:Null<Map<String, CustomCompressionAsset>> = null;
@@ -726,7 +726,7 @@ class Run
 	}
 }
 
-typedef ComppressionData =
+typedef CompressionData =
 {
 	public var input:String;
 	public var output:String;
