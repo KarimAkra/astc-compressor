@@ -145,7 +145,7 @@ class Run
 						{
 							parseCompressionJSON(jsonFile);
 							prepareEncoder();
-							compressFromJSONCommand();
+							compressFromJSONCommand(options.exists('clean'));
 						}
 						else
 						{
@@ -334,7 +334,7 @@ class Run
 	}
 
 	@:noCompletion
-	private static function compressFromJSONCommand():Void
+	private static function compressFromJSONCommand(clean:Bool):Void
 	{
 		if (COMPRESSION_DATA == null)
 			return;
@@ -345,7 +345,6 @@ class Run
 		var quality:String = COMPRESSION_DATA.quality;
 		var output:String = COMPRESSION_DATA.output;
 		var excludes:Null<Array<String>> = COMPRESSION_DATA.excludes;
-		var clean:Null<Bool> = COMPRESSION_DATA.clean ?? false;
 		var premultiplyAlpha:Null<Bool> = COMPRESSION_DATA.premultiplyAlpha ?? true;
 		var extraParams:Array<String> = COMPRESSION_DATA.extraParams ?? [];
 
@@ -735,7 +734,6 @@ typedef CompressionData =
 	public var colorprofile:String;
 	@:optional public var premultiplyAlpha:Bool;
 	@:optional public var extraParams:Array<String>;
-	@:optional public var clean:Bool;
 	@:optional public var excludes:Array<String>;
 	@:optional public var custom:Array<CustomCompressionAsset>;
 }
