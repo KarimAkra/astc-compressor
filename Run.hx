@@ -106,7 +106,6 @@ class Run
 						final input:Null<String> = options.get('i');
 						final blocksize:Null<String> = options.get('blocksize');
 						final quality:Null<String> = options.get('quality');
-						final premultiplyAlpha:Null<Bool> = !options.exists('no-premultiplyAlpha');
 
 						final hasColorProfile:Bool = colorprofile != null
 							&& colorprofile.length > 0 ? COLOR_PROFILES.contains(colorprofile) : false;
@@ -117,7 +116,7 @@ class Run
 						if (hasColorProfile && hasInput && hasBlocksize && hasQuality)
 						{
 							@:nullSafety(Off)
-							compressCommand(colorprofile, input, blocksize, quality, options.get('o'), options.get('excludes'), premultiplyAlpha,
+							compressCommand(colorprofile, input, blocksize, quality, options.get('o'), options.get('excludes'), options.exists('premultiplyAlpha'),
 								options.exists('clean'));
 						}
 						else
@@ -235,7 +234,7 @@ class Run
 
 	@:noCompletion
 	private static function compressCommand(colorprofile:String, input:String, blockSize:String, quality:String, ?output:String, ?excludes:String,
-			?premultiplyAlpha:Bool, ?clean:Bool):Void
+			premultiplyAlpha:Bool, clean:Bool):Void
 	{
 		if (clean && (output != null && output.length > 0 && FileSystem.exists(output) && FileUtil.isDirectory(output)))
 			FileUtil.deletePath(output);
@@ -277,7 +276,7 @@ class Run
 							if (!supportedExtension)
 								return false;
 
-							return needsRecompiled(f, outputFile, blockSize, quality, colorprofile, premultiplyAlpha ?? true, [])
+							return needsRecompiled(f, outputFile, blockSize, quality, colorprofile, premultiplyAlpha, [])
 								&& !isExcluded(path.toString(), excludedFiles);
 						}
 					}
@@ -295,7 +294,7 @@ class Run
 
 					for (file in files)
 					{
-						compressFile(progress, colorprofile, file, output, blockSize, quality, premultiplyAlpha ?? true, []);
+						compressFile(progress, colorprofile, file, output, blockSize, quality, premultiplyAlpha, []);
 					}
 				}
 			}
@@ -311,7 +310,7 @@ class Run
 					{
 						Sys.println('- ${ANSIUtil.apply('${ANSIUtil.apply('Compressing:', [Black, Bold])} colorProfile=${ANSIUtil.apply(colorprofile, [Yellow])} blockSize=${ANSIUtil.apply(blockSize, [Yellow])} quality=${ANSIUtil.apply(quality, [Yellow])}', [White, Bold])}');
 
-						compressFile(colorprofile, path.toString(), output, blockSize, quality, premultiplyAlpha ?? true, []);
+						compressFile(colorprofile, path.toString(), output, blockSize, quality, premultiplyAlpha, []);
 					}
 					else
 					{
@@ -345,7 +344,7 @@ class Run
 		var quality:String = COMPRESSION_DATA.quality;
 		var output:String = COMPRESSION_DATA.output;
 		var excludes:Null<Array<String>> = COMPRESSION_DATA.excludes;
-		var premultiplyAlpha:Null<Bool> = COMPRESSION_DATA.premultiplyAlpha ?? true;
+		var premultiplyAlpha:Bool = COMPRESSION_DATA.premultiplyAlpha ?? false;
 		var extraParams:Array<String> = COMPRESSION_DATA.extraParams ?? [];
 
 		if (clean && (output != null && output.length > 0 && FileSystem.exists(output) && FileUtil.isDirectory(output)))
@@ -534,7 +533,7 @@ class Run
 		Sys.println('  ${ANSIUtil.apply('-quality <level>', [Green])}             Compression quality level: ${ANSIUtil.apply('fastest', [Magenta])}, ${ANSIUtil.apply('fast', [Magenta])}, ${ANSIUtil.apply('medium', [Magenta])}, ${ANSIUtil.apply('thorough', [Magenta])}, ${ANSIUtil.apply('exhaustive', [Magenta])}');
 		Sys.println('  ${ANSIUtil.apply('-o <output>', [Green])}                  (Optional) Output directory for .astc files.');
 		Sys.println('  ${ANSIUtil.apply('-excludes <file>', [Green])}             (Optional) File with list of input paths to skip.');
-		Sys.println('  ${ANSIUtil.apply('-no-premultiplyAlpha', [Green])}         (Optional) Disable alpha premultiplying.');
+		Sys.println('  ${ANSIUtil.apply('-premultiplyAlpha', [Green])}            (Optional) Enable alpha premultiplying.');
 		Sys.println('  ${ANSIUtil.apply('-clean', [Green])}                       (Optional) Clean output directory before compressing.');
 		Sys.println('');
 
@@ -601,10 +600,6 @@ class Run
 			final outputHash:String = outputHashFile.read(dataLength).toString().trim();
 			final inputHash:String = createHash(input, blocksize, quality, colorprofile, premultiplyAlpha, extraParams);
 			outputHashFile.close();
-
-			// Sys.println('$input $inputHash');
-			// Sys.println('$output $outputHash');
-			// Sys.println(inputHash != outputHash);
 
 			return inputHash != outputHash;
 		}
